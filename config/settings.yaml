@@ -1,0 +1,108 @@
+# ========================================
+# 全局配置
+# ========================================
+
+# 关注的 AI 编程工具产品
+products:
+  - name: Claude
+    keywords:
+      - Claude
+      - Claude Code
+      - Claude 4
+      - Claude Opus
+      - Claude Sonnet
+      - Anthropic
+    color: "#D97706"
+
+  - name: GitHub Copilot
+    keywords:
+      - GitHub Copilot
+      - Copilot
+      - Copilot Chat
+      - Copilot Workspace
+      - Copilot Agent
+    color: "#2563EB"
+
+  - name: Codex
+    keywords:
+      - OpenAI Codex
+      - Codex CLI
+      - Codex agent
+    color: "#10B981"
+
+  - name: Cursor
+    keywords:
+      - Cursor IDE
+      - Cursor AI
+      - Cursor editor
+    color: "#8B5CF6"
+
+  - name: Windsurf
+    keywords:
+      - Windsurf
+      - Codeium
+      - Windsurf IDE
+    color: "#EC4899"
+
+  - name: Other AI Coding
+    keywords:
+      - AI coding
+      - AI programmer
+      - AI pair programming
+      - vibe coding
+      - agentic coding
+      - coding agent
+    color: "#6B7280"
+
+# 采集配置
+collection:
+  # 回溯天数（采集最近 N 天的内容）
+  lookback_days: 1
+
+  # 每个数据源最多采集条目数
+  max_items_per_source: 30
+
+  # 每份报告最大条目数
+  max_items_per_report: 50
+
+  # 最低互动量筛选阈值（低于此值的内容被过滤）
+  min_engagement:
+    hackernews: 5        # HN 分数
+    reddit: 10           # Reddit upvotes
+    twitter: 20          # Twitter likes
+    weibo: 50            # 微博转发+评论
+    zhihu: 10            # 知乎赞同
+    tech_news: 0         # 新闻站不按互动量筛选
+
+# LLM 摘要配置
+summarizer:
+  # 首选 LLM 提供商: claude | openai
+  provider: claude
+
+  # Claude 模型
+  claude_model: claude-sonnet-4-20250514
+
+  # OpenAI 模型（备用）
+  openai_model: gpt-4o
+
+  # 每次调用最大 token 数
+  max_tokens: 4096
+
+  # Temperature
+  temperature: 0.3
+
+# 输出配置
+output:
+  # 报告输出目录
+  report_dir: reports
+
+  # 报告文件名模板 (Python strftime)
+  filename_template: "%Y-%m-%d.md"
+
+  # 报告语言
+  language: zh-CN
+
+# 日志配置
+logging:
+  level: INFO
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"

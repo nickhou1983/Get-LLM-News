@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv/
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reports (optional - uncomment to track in git)
+# reports/*.md
+
+# Playwright state
+playwright_state/
+*.json.bak
+
+# Logs
+*.log
+logs/

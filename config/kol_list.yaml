@@ -1,0 +1,209 @@
+# ========================================
+# KOL（关键意见领袖）列表配置
+# 按平台分类，标注影响力等级
+# ========================================
+
+twitter:
+  # AI 研究者 & 工程师
+  - handle: karpathy
+    name: Andrej Karpathy
+    bio: 前 Tesla AI 总监，前 OpenAI 联合创始人
+    tier: S
+
+  - handle: swyx
+    name: Shawn Wang (swyx)
+    bio: AI Engineer 社区创始人，Latent Space 播客主持
+    tier: S
+
+  - handle: simonw
+    name: Simon Willison
+    bio: Django 联合创始人，AI 工具深度用户，sqlite 专家
+    tier: S
+
+  - handle: alexalbert__
+    name: Alex Albert
+    bio: Anthropic 提示工程负责人
+    tier: S
+
+  - handle: AmandaAskell
+    name: Amanda Askell
+    bio: Anthropic 研究员，Claude 性格设计师
+    tier: A
+
+  - handle: amasad
+    name: Amjad Masad
+    bio: Replit CEO，AI 编程先驱
+    tier: S
+
+  - handle: shaboroshin
+    name: Sharif Shameem
+    bio: Cursor 联合创始人
+    tier: A
+
+  - handle: mckaywrigley
+    name: McKay Wrigley
+    bio: AI 开发工具评测者，Takeoff 创始人
+    tier: A
+
+  - handle: jxnlco
+    name: Jason Liu
+    bio: AI 工程师，instructor 库作者
+    tier: A
+
+  - handle: svpino
+    name: Santiago Valdarrama
+    bio: ML 工程教育者，AI 编程实践
+    tier: A
+
+  - handle: emaboroshinc
+    name: Emad Mostaque
+    bio: AI 行业观察者
+    tier: B
+
+  - handle: bindureddy
+    name: Bindu Reddy
+    bio: Abacus.AI CEO
+    tier: B
+
+  - handle: GregBrockworthy
+    name: Greg Brockman
+    bio: OpenAI 联合创始人
+    tier: S
+
+  - handle: sama
+    name: Sam Altman
+    bio: OpenAI CEO
+    tier: S
+
+  - handle: daboriskay
+    name: Dario Amodei
+    bio: Anthropic CEO
+    tier: S
+
+  - handle: jackclark
+    name: Jack Clark
+    bio: Anthropic 联合创始人
+    tier: A
+
+  - handle: DrJimFan
+    name: Jim Fan
+    bio: NVIDIA AI Agent 研究负责人
+    tier: A
+
+  - handle: laboroshinreimer
+    name: Logan Kilpatrick
+    bio: Google AI DevRel 负责人，前 OpenAI
+    tier: A
+
+  - handle: rasaboroshinbt
+    name: Rasa Bot
+    bio: AI Chatbot 平台
+    tier: B
+
+reddit:
+  # 关注的子版块
+  subreddits:
+    - name: ClaudeAI
+      description: Claude 用户社区
+      priority: high
+
+    - name: ChatGPT
+      description: ChatGPT / OpenAI 综合讨论
+      priority: high
+
+    - name: github
+      description: GitHub 官方讨论
+      priority: medium
+
+    - name: CopilotForGithub
+      description: GitHub Copilot 专区
+      priority: high
+
+    - name: LocalLLaMA
+      description: 本地 LLM 社区，经常讨论编程工具
+      priority: medium
+
+    - name: cursor
+      description: Cursor IDE 社区
+      priority: high
+
+    - name: programming
+      description: 编程综合讨论
+      priority: low
+
+    - name: MachineLearning
+      description: ML 学术和工程讨论
+      priority: medium
+
+hackernews:
+  # HN 不需要 KOL 列表，按关键词+分数搜索
+  min_score: 10
+  search_tags:
+    - story
+    - show_hn
+    - ask_hn
+
+weibo:
+  # 微博 KOL
+  - uid: "1727858283"
+    name: 宝玉xp
+    bio: AI 领域头部中文博主，科技译者
+    tier: S
+
+  - uid: "5722964389"
+    name: 归藏
+    bio: AI 工具评测和资讯博主
+    tier: S
+
+  - uid: ""
+    name: 硅谷王川
+    bio: 硅谷投资人，AI 行业观察
+    tier: A
+
+  - uid: ""
+    name: 阑夕
+    bio: 科技评论人
+    tier: A
+
+zhihu:
+  # 知乎 KOL (通过话题搜索为主)
+  topics:
+    - Claude
+    - GitHub Copilot
+    - AI 编程
+    - Cursor
+    - 大模型编程
+
+  authors:
+    - name: 苏剑林
+      url_token: su-jian-lin-74
+      bio: NLP 研究者
+      tier: A
+
+tech_news:
+  # 技术新闻站 RSS/URL
+  sources:
+    - name: The Verge - AI
+      url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+      type: rss
+      language: en
+
+    - name: TechCrunch - AI
+      url: https://techcrunch.com/category/artificial-intelligence/feed/
+      type: rss
+      language: en
+
+    - name: Ars Technica - AI
+      url: https://feeds.arstechnica.com/arstechnica/technology-lab
+      type: rss
+      language: en
+
+    - name: 36Kr - AI
+      url: https://36kr.com/information/AI/
+      type: html
+      language: zh
+
+    - name: Hacker News - Best
+      url: https://hnrss.org/best
+      type: rss
+      language: en
