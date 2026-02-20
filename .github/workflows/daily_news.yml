@@ -62,7 +62,11 @@ jobs:
           # LLM
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'claude' }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT }}
+          AZURE_OPENAI_API_VERSION: ${{ secrets.AZURE_OPENAI_API_VERSION }}
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'azure_openai' }}
           # 微博/知乎
           WEIBO_COOKIE: ${{ secrets.WEIBO_COOKIE }}
           ZHIHU_COOKIE: ${{ secrets.ZHIHU_COOKIE }}

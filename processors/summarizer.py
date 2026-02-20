@@ -1,7 +1,7 @@
 """
 LLM 智能摘要生成器。
 
-使用 Claude (Anthropic) 或 GPT (OpenAI) 对采集到的信息进行：
+使用 Claude (Anthropic)、Azure OpenAI 或 OpenAI 对采集到的信息进行：
 1. 逐条一句话摘要
 2. 按产品分类的趋势总结
 3. KOL 核心观点提炼
@@ -91,6 +91,15 @@ class Summarizer:
         self.max_tokens = summarizer_cfg.get("max_tokens", 4096)
         self.temperature = summarizer_cfg.get("temperature", 0.3)
 
+        # Azure OpenAI 配置
+        azure_cfg = summarizer_cfg.get("azure_openai", {})
+        self.azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT", azure_cfg.get("endpoint", ""))
+        self.azure_api_key = os.getenv("AZURE_OPENAI_API_KEY", azure_cfg.get("api_key", ""))
+        self.azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", azure_cfg.get("deployment", ""))
+        self.azure_api_version = os.getenv(
+            "AZURE_OPENAI_API_VERSION", azure_cfg.get("api_version", "2024-12-01-preview")
+        )
+
     async def generate_daily_summary(self, items: list[NewsItem]) -> str:
         """
         生成日报摘要文本。
@@ -175,7 +184,9 @@ class Summarizer:
 
     async def _call_llm(self, prompt: str) -> str:
         """调用 LLM API。"""
-        if self.provider == "claude":
+        if self.provider == "azure_openai":
+            return await self._call_azure_openai(prompt)
+        elif self.provider == "claude":
             return await self._call_claude(prompt)
         elif self.provider == "openai":
             return await self._call_openai(prompt)
@@ -207,22 +218,55 @@ class Summarizer:
             return message.content[0].text
 
         except ImportError:
-            logger.warning("anthropic 库未安装，尝试 OpenAI 作为备份")
-            return await self._call_openai(prompt)
+            logger.warning("anthropic 库未安装，尝试备份方案")
+            return await self._try_fallback_providers(prompt)
         except Exception as e:
             logger.error(f"Claude API 调用失败: {e}")
-            # Fallback to OpenAI
-            if os.getenv("OPENAI_API_KEY"):
-                logger.info("切换到 OpenAI 作为备份")
-                return await self._call_openai(prompt)
-            return self._generate_fallback_summary(prompt)
+            return await self._try_fallback_providers(prompt)
+
+    async def _call_azure_openai(self, prompt: str) -> str:
+        """调用 Azure OpenAI API。"""
+        if not self.azure_endpoint or not self.azure_api_key or not self.azure_deployment:
+            logger.warning("未完整配置 Azure OpenAI (需要 ENDPOINT, API_KEY, DEPLOYMENT)，尝试备份方案")
+            return await self._try_fallback_providers(prompt, exclude="azure_openai")
+
+        try:
+            from openai import AsyncAzureOpenAI
+
+            client = AsyncAzureOpenAI(
+                azure_endpoint=self.azure_endpoint,
+                api_key=self.azure_api_key,
+                api_version=self.azure_api_version,
+            )
+
+            response = await client.chat.completions.create(
+                model=self.azure_deployment,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "你是一个 AI 编程工具行业分析师，擅长从社交媒体和新闻中提炼关键信息。",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+            )
+
+            return response.choices[0].message.content or ""
+
+        except ImportError:
+            logger.error("openai 库未安装")
+            return await self._try_fallback_providers(prompt, exclude="azure_openai")
+        except Exception as e:
+            logger.error(f"Azure OpenAI API 调用失败: {e}")
+            return await self._try_fallback_providers(prompt, exclude="azure_openai")
 
     async def _call_openai(self, prompt: str) -> str:
         """调用 OpenAI API。"""
         api_key = os.getenv("OPENAI_API_KEY", "")
         if not api_key:
-            logger.warning("未配置 OPENAI_API_KEY，跳过 LLM 摘要")
-            return self._generate_fallback_summary(prompt)
+            logger.warning("未配置 OPENAI_API_KEY，尝试备份方案")
+            return await self._try_fallback_providers(prompt, exclude="openai")
 
         try:
             from openai import AsyncOpenAI
@@ -246,10 +290,39 @@ class Summarizer:
 
         except ImportError:
             logger.error("openai 库未安装")
-            return self._generate_fallback_summary(prompt)
+            return await self._try_fallback_providers(prompt, exclude="openai")
         except Exception as e:
             logger.error(f"OpenAI API 调用失败: {e}")
-            return self._generate_fallback_summary(prompt)
+            return await self._try_fallback_providers(prompt, exclude="openai")
+
+    async def _try_fallback_providers(self, prompt: str, exclude: str = "") -> str:
+        """按优先级尝试备用 LLM 提供商。"""
+        fallback_order = ["azure_openai", "claude", "openai"]
+
+        for provider in fallback_order:
+            if provider == exclude or provider == self.provider:
+                continue
+
+            if provider == "azure_openai" and self.azure_endpoint and self.azure_api_key and self.azure_deployment:
+                logger.info("切换到 Azure OpenAI 作为备份")
+                try:
+                    return await self._call_azure_openai(prompt)
+                except Exception:
+                    continue
+            elif provider == "claude" and os.getenv("ANTHROPIC_API_KEY"):
+                logger.info("切换到 Claude 作为备份")
+                try:
+                    return await self._call_claude(prompt)
+                except Exception:
+                    continue
+            elif provider == "openai" and os.getenv("OPENAI_API_KEY"):
+                logger.info("切换到 OpenAI 作为备份")
+                try:
+                    return await self._call_openai(prompt)
+                except Exception:
+                    continue
+
+        return self._generate_fallback_summary(prompt)
 
     def _format_items_for_prompt(self, items: list[NewsItem]) -> str:
         """将 NewsItem 列表格式化为 prompt 输入文本。"""
@@ -272,6 +345,6 @@ class Summarizer:
         """当 LLM API 不可用时的降级摘要（简单的统计信息）。"""
         return (
             "> ⚠️ LLM API 未配置或调用失败，以下为原始数据汇总。\n"
-            "> 请配置 ANTHROPIC_API_KEY 或 OPENAI_API_KEY 以获得智能摘要。\n\n"
+            "> 请配置 AZURE_OPENAI_* 或 ANTHROPIC_API_KEY 或 OPENAI_API_KEY 以获得智能摘要。\n\n"
             "请查看下方各数据源的详细条目。"
         )
